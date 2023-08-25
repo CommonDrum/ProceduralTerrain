@@ -12,7 +12,7 @@ public class MeshGenerator : MonoBehaviour
     void Start()
     {
         var vertices = new Vector3[(size + 1) * (size + 1)];
-        var triangles = new int[size * size * 6];
+        var triangles = new int[(size) * (size) * 6];
 
         var mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
@@ -20,34 +20,38 @@ public class MeshGenerator : MonoBehaviour
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++) {
-                var y = Mathf.PerlinNoise(i * .3f, j * .3f) * 2f;
-                vertices[i * size + j] += new Vector3(i, y, j);
+                //hight of sin wave
+                float y = Mathf.Sin((float)i / size * 2 * Mathf.PI) + Mathf.Sin((float)j / size * 2 * Mathf.PI);
+                vertices[i * size + j] = new Vector3(i, y, j);
             }
 
 
         }
 
-        int vert = 0;
-        int tris = 0;
-        for (int i = 0; i < size - 1; i++) {
-            for (int j = 0; j < size - 1; j++) {
-                triangles[tris + 0] = vert + 0;
-                triangles[tris + 1] = vert + size + 1;
-                triangles[tris + 2] = vert + 1;
-                triangles[tris + 3] = vert + 1;
-                triangles[tris + 4] = vert + size + 1;
-                triangles[tris + 5] = vert + size + 2;
-                vert++;
-                tris += 6;
+        
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                    
+                    int squareIndex = y * size + x;
+                    int triOffset = squareIndex * 6;
+                    triangles[triOffset + 0] = squareIndex + 0;
+                    triangles[triOffset + 1] = squareIndex + size + 1;
+                    triangles[triOffset + 2] = squareIndex + 1;
+                    triangles[triOffset + 3] = squareIndex + 1;
+                    triangles[triOffset + 4] = squareIndex + size + 1;
+                    triangles[triOffset + 5] = squareIndex + size + 2;
+    
             }
-            vert++;
+            
         }
 
         mesh.Clear();
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         
-
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.Optimize();
         
 
     }
