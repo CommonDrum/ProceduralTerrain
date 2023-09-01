@@ -28,6 +28,9 @@ public class MeshGenerator : MonoBehaviour
 
         }
 
+
+        // Comment for github
+
         
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
