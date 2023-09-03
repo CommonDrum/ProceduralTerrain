@@ -2,64 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeshGenerator : MonoBehaviour
+public static class MeshGenerator
 {
-    public int size = 10;
-    Mesh mesh;
+  
+
+    public static void GenerateTerrainMesh(float[,] heightMap){
+    int width = heightMap.GetLenght(0);
+    int height = heightMap.GetLenght(1);
+
+
+    MeshData meshData = new MeshData(width, height);
+    int vertexIndex = 0;
+
+    for (int y = 0; y < height; y++){
+        for (int x = 0; x < width; x++){
+            meshData.vertices[vertexIndex] = new Vector3(x, heightMap[x,y], y);
+            vertexIndex++;
+        }
+    }
     
+    }
+}
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        var vertices = new Vector3[(size + 1) * (size + 1)];
-        var triangles = new int[(size) * (size) * 6];
+    public class MeshData{
+        public Vector3[] vertices;
+        public int[]    triangles;
+        int triangleIndex = 0;
 
-        var mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
-
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++) {
-                //hight of sin wave
-                float y = Mathf.Sin((float)i / size * 2 * Mathf.PI) + Mathf.Sin((float)j / size * 2 * Mathf.PI);
-                vertices[i * size + j] = new Vector3(i, y, j);
-            }
-
-
+        public MeshData(int meshWidth, int meshHeight){
+            vertices = new Vector3[meshWidth * meshHeight];
+            triangles = new int[(meshWidth - 1) * (meshHeight - 1) * 6];    // For each sqare we have 6 ints for two triangles
+        
         }
 
+         public void AddTriangle(int a, int b, int c){
+            triangles[triangleIndex] = a;
+            triangles[triangleIndex + 1] = b;
+            triangles[triangleIndex + 2] = c;
 
-        
-
-        
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                    
-                    int squareIndex = y * size + x;
-                    int triOffset = squareIndex * 6;
-                    triangles[triOffset + 0] = squareIndex + 0;
-                    triangles[triOffset + 1] = squareIndex + size + 1;
-                    triangles[triOffset + 2] = squareIndex + 1;
-                    triangles[triOffset + 3] = squareIndex + 1;
-                    triangles[triOffset + 4] = squareIndex + size + 1;
-                    triangles[triOffset + 5] = squareIndex + size + 2;
-    
-            }
+            triangleIndex += 3;
             
-        }
-
-        mesh.Clear();
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        mesh.Optimize();
-        
-
+         }
     }
 
    
-
-  
-}
